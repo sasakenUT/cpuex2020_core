@@ -6,7 +6,7 @@ module test_alu_v();
   // Inputs
   logic [31:0] A;
   logic [31:0] B;
-  logic [2:0] F;
+  logic [4:0] F;
 
   // Outputs
   logic [31:0] Y;
@@ -17,7 +17,7 @@ module test_alu_v();
 
   // Simulation variables
   logic [31:0] vectornum, errors;
-  logic [99:0] testvectors[100:0];
+  logic [101:0] testvectors[100:0];
   logic [31:0] ExpectedY;
   logic        ExpectedZero;
 
@@ -52,12 +52,12 @@ module test_alu_v();
     begin
       if ({Y, Zero} !== {ExpectedY, ExpectedZero})
         begin
-          $display("Error: inputs: F = %h, A = %h, B = %h", F, A, B);
-          $display("  Y = %h, Zero = %b, \n (Expected Y = %h, Expected Zero = %h", Y, Zero, ExpectedY, ExpectedZero);
+          $display("Error: inputs: F = %h(hex), A = %h(hex), B = %h(hex)", F, A, B);
+          $display("  Y = %h(hex), Zero = %b, \n (Expected Y = %h(hex), Expected Zero = %b)", Y, Zero, ExpectedY, ExpectedZero);
           errors = errors + 1;
         end
       vectornum = vectornum + 1;
-      if (testvectors[vectornum] === 100'hx)
+      if (testvectors[vectornum] === 102'hx)
         begin
           $display("%d tests completed with %d errors", vectornum, errors);
           $finish;
