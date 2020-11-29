@@ -2,8 +2,8 @@
 
 module alu(input  wire logic [31:0] A, B,   // input should be wire logic to pass vivado synsthesis
            input  wire logic [4:0]  F,
-           output logic [31:0] Y,
-           output logic Zero);
+           output logic      [31:0] Y,
+           output logic             Zero);
 
   logic [31:0] S, Bout;
   logic [4:0]  shamt;
