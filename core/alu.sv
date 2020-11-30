@@ -28,7 +28,7 @@ module alu(input  wire logic [31:0] A, B,   // input should be wire logic to pas
       4'b1000: Y = $signed(A) >>> shamt;
       4'b1001: Y = M[31:0];
       4'b1010: Y = M[63:32];
-      default: Y = 32'b0;  // default should never be happened
+      default: Y = 32'b0;  // default should never happen
     endcase
 
   assign Zero = (Y == 32'b0);
