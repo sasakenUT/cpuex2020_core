@@ -10,12 +10,11 @@ module maindec(input  wire logic       clk, rstn,
                output logic      [2:0] aluop);
 
   // TODO: Vivado で合成可能...?
-  // TODO: mul, mulh に対応
   typedef enum logic [3:0] {FETCH, DECODE, MEMADR, MEMREAD, MEMWRITEBACK,
                             MEMWRITE, EXECUTE, ALUWRITEBACK, BRANCH,
                             IMMEXECUTE, IMMWRITEBACK, LUIEX, AUIPCEX,
                             JALEX, JALREX} statetype;
-  statetype [3:0] state, nextstate;
+  statetype state, nextstate;
 
   parameter RTYPE = 7'b0110011;
   parameter ITYPE = 7'b0010011;
@@ -34,69 +33,67 @@ module maindec(input  wire logic       clk, rstn,
     if(~rstn)  state <= FETCH;
     else       state <= nextstate;
 
-  // TODO: blocking or non-blocking ... ?
-  // 組み合わせ回路なのでブロッキング代入 = では ... ?
   // next state logic
   always_comb
     case(state)
-      FETCH:        nextstate <= DECODE;
+      FETCH:        nextstate = DECODE;
       DECODE:       case(op)
-                      LW:       nextstate <= MEMADR;
-                      SW:       nextstate <= MEMADR;
-                      RTYPE:    nextstate <= EXECUTE;
-                      BTYPE:    nextstate <= BRANCH;
-                      ITYPE:    nextstate <= IMMEXECUTE;
-                      LUI:      nextstate <= LUIEX;
-                      AUIPC:    nextstate <= AUIPCEX;
-                      JAL:      nextstate <= JALEX;
-                      JALR:     nextstate <= JALREX;
-                      default:  nextstate <= FETCH;   // should never happen
+                      LW:       nextstate = MEMADR;
+                      SW:       nextstate = MEMADR;
+                      RTYPE:    nextstate = EXECUTE;
+                      BTYPE:    nextstate = BRANCH;
+                      ITYPE:    nextstate = IMMEXECUTE;
+                      LUI:      nextstate = LUIEX;
+                      AUIPC:    nextstate = AUIPCEX;
+                      JAL:      nextstate = JALEX;
+                      JALR:     nextstate = JALREX;
+                      default:  nextstate = FETCH;   // should never happen
                     endcase
       MEMADR:       case(op)
-                      LW:       nextstate <= MEMREAD;
-                      SW:       nextstate <= MEMWRITE;
-                      default:  nextstate <= FETCH;   // should never happen
+                      LW:       nextstate = MEMREAD;
+                      SW:       nextstate = MEMWRITE;
+                      default:  nextstate = FETCH;   // should never happen
                     endcase
-      MEMREAD:      nextstate <= MEMWRITEBACK;
-      MEMWRITEBACK: nextstate <= FETCH;
-      MEMWRITE:     nextstate <= FETCH;
-      EXECUTE:      nextstate <= ALUWRITEBACK;
-      ALUWRITEBACK: nextstate <= FETCH;
-      BRANCH:       nextstate <= FETCH;
-      IMMEXECUTE:   nextstate <= IMMWRITEBACK;
-      IMMWRITEBACK: nextstate <= FETCH;
-      LUIEX:        nextstate <= FETCH;
-      AUIPCEX:      nextstate <= FETCH;
-      JALEX:        nextstate <= FETCH;
-      JALREX:       nextstate <= FETCH;
-      default:      nextstate <= FETCH;   // should never happen
+      MEMREAD:      nextstate = MEMWRITEBACK;
+      MEMWRITEBACK: nextstate = FETCH;
+      MEMWRITE:     nextstate = FETCH;
+      EXECUTE:      nextstate = ALUWRITEBACK;
+      ALUWRITEBACK: nextstate = FETCH;
+      BRANCH:       nextstate = FETCH;
+      IMMEXECUTE:   nextstate = IMMWRITEBACK;
+      IMMWRITEBACK: nextstate = FETCH;
+      LUIEX:        nextstate = FETCH;
+      AUIPCEX:      nextstate = FETCH;
+      JALEX:        nextstate = FETCH;
+      JALREX:       nextstate = FETCH;
+      default:      nextstate = FETCH;   // should never happen
     endcase
 
   // output logic
   assign {pcwrite, memwrite, irwrite, regwrite, pcbufwrite, // 5bit
           iord,                                             // 1bit
-          alusrca, alusrcb, regsrc, pcsrc                   // 8bit
+          alusrca, alusrcb, regsrc, pcsrc,                  // 8bit
           branch,                                           // 1bit
           aluop} = controls;                                // 3bit
 
   always_comb
     case(state)
-      FETCH:        controls <= 18'b10101_0_00_01_00_00_0_000;
-      DECODE:       controls <= 18'b00000_0_01_10_00_00_0_000;
-      MEMADR:       controls <= 18'b00000_0_10_10_00_00_0_000;
-      MEMREAD:      controls <= 18'b00000_1_00_00_00_00_0_000;
-      MEMWRITEBACK: controls <= 18'b00010_0_00_00_01_00_0_000;
-      MEMWRITE:     controls <= 18'b01000_1_00_00_00_00_0_000;
-      EXECUTE:      controls <= 18'b00000_0_10_00_00_00_0_100;
-      ALUWRITEBACK: controls <= 18'b00010_0_00_00_00_00_0_000;
-      BRANCH:       controls <= 18'b00000_0_10_00_00_01_1_111;
-      IMMEXECUTE:   controls <= 18'b00000_0_10_10_00_00_0_101;
-      IMMWRITEBACK: controls <= 18'b00010_0_00_00_00_00_0_000;
-      LUIEX:        controls <= 18'b00010_0_00_00_10_00_0_000;
-      AUIPCEX:      controls <= 18'b00010_0_00_00_00_00_0_000;
-      JALEX:        controls <= 18'b10000_0_00_00_11_01_0_000;
-      JALREX:       controls <= 18'b10010_0_10_10_11_10_0_000;
-      default:      controls <= 18'b00000_x_xx_xx_xx_xx_x_xxx;  // should never happen
+      FETCH:        controls = 18'b10101_0_00_01_00_00_0_000;
+      DECODE:       controls = 18'b00000_0_01_10_00_00_0_000;
+      MEMADR:       controls = 18'b00000_0_10_10_00_00_0_000;
+      MEMREAD:      controls = 18'b00000_1_00_00_00_00_0_000;
+      MEMWRITEBACK: controls = 18'b00010_0_00_00_01_00_0_000;
+      MEMWRITE:     controls = 18'b01000_1_00_00_00_00_0_000;
+      EXECUTE:      controls = 18'b00000_0_10_00_00_00_0_100;
+      ALUWRITEBACK: controls = 18'b00010_0_00_00_00_00_0_000;
+      BRANCH:       controls = 18'b00000_0_10_00_00_01_1_111;
+      IMMEXECUTE:   controls = 18'b00000_0_10_10_00_00_0_101;
+      IMMWRITEBACK: controls = 18'b00010_0_00_00_00_00_0_000;
+      LUIEX:        controls = 18'b00010_0_00_00_10_00_0_000;
+      AUIPCEX:      controls = 18'b00010_0_00_00_00_00_0_000;
+      JALEX:        controls = 18'b10000_0_00_00_11_01_0_000;
+      JALREX:       controls = 18'b10010_0_10_10_11_10_0_000;
+      default:      controls = 18'b00000_x_xx_xx_xx_xx_x_xxx;  // should never happen
     endcase
 
 endmodule
