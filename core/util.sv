@@ -51,4 +51,11 @@ module flopenr (input  wire logic        clk, rstn,
 
 endmodule
 
+module setlsb0 (input  wire logic [31:0] a,
+                output logic      [31:0] q);
+
+  assign q = {a[31:1], 1'b0};
+
+endmodule
+
 `default_nettype wire
