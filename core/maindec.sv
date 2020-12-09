@@ -10,7 +10,8 @@ module maindec(input  wire logic       clk, rstn,
                output logic      [2:0] aluop);
 
   // TODO: Vivado で合成可能...?
-  typedef enum logic [3:0] {FETCH, DECODE, MEMADR, MEMREAD, MEMWRITEBACK,
+  typedef enum logic [4:0] {FETCH, FETCHWAIT, FETCHVALID, DECODE, MEMADR,
+                            MEMREAD, MEMREADWAIT, MEMREADVALID, MEMWRITEBACK,
                             MEMWRITE, EXECUTE, ALUWRITEBACK, BRANCH,
                             IMMEXECUTE, IMMWRITEBACK, LUIEX, AUIPCEX,
                             JALEX, JALREX} statetype;
@@ -36,7 +37,9 @@ module maindec(input  wire logic       clk, rstn,
   // next state logic
   always_comb
     case(state)
-      FETCH:        nextstate = DECODE;
+      FETCH:        nextstate = FETCHWAIT;
+      FETCHWAIT:    nextstate = FETCHVALID;
+      FETCHVALID:   nextstate = DECODE;
       DECODE:       case(op)
                       LW:       nextstate = MEMADR;
                       SW:       nextstate = MEMADR;
@@ -54,7 +57,9 @@ module maindec(input  wire logic       clk, rstn,
                       SW:       nextstate = MEMWRITE;
                       default:  nextstate = FETCH;   // should never happen
                     endcase
-      MEMREAD:      nextstate = MEMWRITEBACK;
+      MEMREAD:      nextstate = MEMREADWAIT;
+      MEMREADWAIT:  nextstate = MEMREADVALID;
+      MEMREADVALID: nextstate = MEMWRITEBACK;
       MEMWRITEBACK: nextstate = FETCH;
       MEMWRITE:     nextstate = FETCH;
       EXECUTE:      nextstate = ALUWRITEBACK;
@@ -78,10 +83,14 @@ module maindec(input  wire logic       clk, rstn,
 
   always_comb
     case(state)
-      FETCH:        controls = 18'b10101_0_00_01_00_00_0_000;
+      FETCH:        controls = 18'b10001_0_00_01_00_00_0_000;
+      FETCHWAIT:    controls = 18'b00000_0_00_00_00_00_0_000;
+      FETCHVALID:   controls = 18'b00100_0_00_00_00_00_0_000;
       DECODE:       controls = 18'b00000_0_01_10_00_00_0_000;
       MEMADR:       controls = 18'b00000_0_10_10_00_00_0_000;
       MEMREAD:      controls = 18'b00000_1_00_00_00_00_0_000;
+      MEMREADWAIT:  controls = 18'b00000_1_00_00_00_00_0_000;
+      MEMREADVALID: controls = 18'b00000_1_00_00_00_00_0_000;
       MEMWRITEBACK: controls = 18'b00010_0_00_00_01_00_0_000;
       MEMWRITE:     controls = 18'b01000_1_00_00_00_00_0_000;
       EXECUTE:      controls = 18'b00000_0_10_00_00_00_0_100;
