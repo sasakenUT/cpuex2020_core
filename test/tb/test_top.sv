@@ -6,7 +6,7 @@ module test_top(input wire logic clk, rstn);
   logic        memwrite;
   logic [19:0] addra;
 
-  assign addra = adr[19:0];
+  assign addra = adr[21:2];
 
   // instantiate processor and memory
   riscv riscv(clk, rstn, adr, writedata, memwrite, readdata);
