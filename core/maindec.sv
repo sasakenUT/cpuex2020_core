@@ -100,7 +100,7 @@ module maindec(input  wire logic       clk, rstn,
       IMMWRITEBACK: controls = 18'b00010_0_00_00_00_00_0_000;
       LUIEX:        controls = 18'b00010_0_00_00_10_00_0_000;
       AUIPCEX:      controls = 18'b00010_0_00_00_00_00_0_000;
-      JALEX:        controls = 18'b10000_0_00_00_11_01_0_000;
+      JALEX:        controls = 18'b10010_0_00_00_11_01_0_000;
       JALREX:       controls = 18'b10010_0_10_10_11_10_0_000;
       default:      controls = 18'b00000_x_xx_xx_xx_xx_x_xxx;  // should never happen
     endcase
