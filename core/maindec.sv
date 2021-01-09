@@ -129,7 +129,7 @@ module maindec(input  wire logic       clk, rstn,
       RECVB_GO:     controls = 21'b00000_0_00_00_000_00_0_000_10;
       RECVB_WAIT:   controls = 21'b00000_0_00_00_000_00_0_000_00;
       RECVB_WRITE:  controls = 21'b00010_0_00_00_100_00_0_000_00;
-      default:      controls = 18'b00000_x_xx_xx_xx_xx_x_xxx;  // should never happen
+      default:      controls = 21'b00000_x_xx_xx_xxx_xx_x_xxx_xx;  // should never happen
     endcase
 
 endmodule

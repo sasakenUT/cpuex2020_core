@@ -3,7 +3,9 @@
 module riscv(input  wire logic        clk, rstn,
              output logic      [31:0] adr, writedata,
              output logic             memwrite,
-             input  wire logic [31:0] readdata);
+             input  wire logic [31:0] readdata,
+             output wire              txd,
+             input  wire logic        rxd);
 
   logic       pcen, irwrite, regwrite, pcbufwrite;
   logic       iord;
@@ -33,8 +35,9 @@ module riscv(input  wire logic        clk, rstn,
   uart_unit  u(clk, rstn,
                uart_done,
                rors, uart_go,
+               rxdata,
                txdata,
-               rxdata);
+               txd, rxd);
 
   datapath  dp(clk, rstn,
                pcen, irwrite, regwrite, pcbufwrite,
