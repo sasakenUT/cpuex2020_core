@@ -8,6 +8,7 @@ module mux2 (input  wire logic [31:0] d0, d1,
 
 endmodule
 
+
 module mux3 (input  wire logic [31:0] d0, d1, d2,
              input  wire logic [1:0]  s,
              output logic      [31:0] y);
@@ -16,6 +17,8 @@ module mux3 (input  wire logic [31:0] d0, d1, d2,
 
 endmodule
 
+
+/*
 module mux4 (input  wire logic [31:0] d0, d1, d2, d3,
              input  wire logic [1:0]  s,
              output logic      [31:0] y);
@@ -29,6 +32,25 @@ module mux4 (input  wire logic [31:0] d0, d1, d2, d3,
     endcase
 
 endmodule
+*/
+
+
+module mux5 (input  wire logic [31:0] d0, d1, d2, d3, d4,
+             input  wire logic [2:0] s,
+             output logic      [31:0] y);
+
+  always_comb
+    case(s)
+      3'b000: y = d0;
+      3'b001: y = d1;
+      3'b010: y = d2;
+      3'b011: y = d3;
+      3'b100: y = d4;
+      default: y = d4;
+    endcase
+
+endmodule
+
 
 module flopr (input  wire logic        clk, rstn,
               input  wire logic [31:0] d,
@@ -40,6 +62,7 @@ module flopr (input  wire logic        clk, rstn,
 
 endmodule
 
+
 module flopenr (input  wire logic        clk, rstn,
                 input  wire logic        en,
                 input  wire logic [31:0] d,
@@ -50,6 +73,7 @@ module flopenr (input  wire logic        clk, rstn,
    else if (en)    q <= d;
 
 endmodule
+
 
 module setlsb0 (input  wire logic [31:0] a,
                 output logic      [31:0] q);

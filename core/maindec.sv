@@ -5,16 +5,20 @@ module maindec(input  wire logic       clk, rstn,
                output logic            pcwrite, memwrite,
                                        irwrite, regwrite, pcbufwrite,
                output logic            iord,
-               output logic      [1:0] alusrca, alusrcb, regsrc, pcsrc,
+               output logic      [1:0] alusrca, alusrcb,
+               output logic      [2:0] regsrc,
+               output logic      [1:0] pcsrc,
                output logic            branch,
-               output logic      [2:0] aluop);
+               output logic      [2:0] aluop,
+               input  wire logic       uart_done,
+               output logic            rors, uart_go);
 
-  // TODO: Vivado で合成可能...?
   typedef enum logic [4:0] {FETCH, FETCHWAIT, FETCHVALID, DECODE, MEMADR,
                             MEMREAD, MEMREADWAIT, MEMREADVALID, MEMWRITEBACK,
                             MEMWRITE, EXECUTE, ALUWRITEBACK, BRANCH,
                             IMMEXECUTE, IMMWRITEBACK, LUIEX, AUIPCEX,
-                            JALEX, JALREX} statetype;
+                            JALEX, JALREX, SENDB_GO, SENDB_WAIT, RECVB_GO,
+                            RECVB_WAIT, RECVB_WRITE} statetype;
   statetype state, nextstate;
 
   parameter RTYPE = 7'b0110011;
@@ -26,8 +30,10 @@ module maindec(input  wire logic       clk, rstn,
   parameter JALR  = 7'b1100111;
   parameter LW    = 7'b0000011;
   parameter SW    = 7'b0100011;
+  parameter RECVB = 7'b0000001;
+  parameter SENDB = 7'b0000010;
 
-  logic [17:0] controls;
+  logic [20:0] controls;    // TODO: extend bit width
 
   // state register
   always_ff @(posedge clk)
@@ -50,6 +56,8 @@ module maindec(input  wire logic       clk, rstn,
                       AUIPC:    nextstate = AUIPCEX;
                       JAL:      nextstate = JALEX;
                       JALR:     nextstate = JALREX;
+                      RECVB:    nextstate = RECVB_GO;
+                      SENDB:    nextstate = SENDB_GO;
                       default:  nextstate = FETCH;   // should never happen
                     endcase
       MEMADR:       case(op)
@@ -71,37 +79,56 @@ module maindec(input  wire logic       clk, rstn,
       AUIPCEX:      nextstate = FETCH;
       JALEX:        nextstate = FETCH;
       JALREX:       nextstate = FETCH;
+      SENDB_GO:     nextstate = SENDB_WAIT;
+      SENDB_WAIT:   case(uart_done)                 // busy wait until uart_done becomes 1
+                      1'b1:     nextstate = FETCH;
+                      1'b0:     nextstate = SENDB_WAIT;
+                    endcase
+      RECVB_GO:     nextstate = RECVB_WAIT;
+      RECVB_WAIT:   case(uart_done)
+                      1'b1:     nextstate = RECVB_WRITE;
+                      1'b0:     nextstate = RECVB_WAIT;
+                    endcase
+      RECVB_WRITE:  nextstate = FETCH;
       default:      nextstate = FETCH;   // should never happen
     endcase
 
   // output logic
   assign {pcwrite, memwrite, irwrite, regwrite, pcbufwrite, // 5bit
           iord,                                             // 1bit
-          alusrca, alusrcb, regsrc, pcsrc,                  // 8bit
+          alusrca, alusrcb,                                 // 4bit
+          regsrc,                                           // 3bit
+          pcsrc,                                            // 2bit
           branch,                                           // 1bit
-          aluop} = controls;                                // 3bit
+          aluop,                                            // 3bit
+          rors, uart_go} = controls;                        // 2bit
 
   always_comb
     case(state)
-      FETCH:        controls = 18'b10001_0_00_01_00_00_0_000;
-      FETCHWAIT:    controls = 18'b00000_0_00_00_00_00_0_000;
-      FETCHVALID:   controls = 18'b00100_0_00_00_00_00_0_000;
-      DECODE:       controls = 18'b00000_0_01_10_00_00_0_000;
-      MEMADR:       controls = 18'b00000_0_10_10_00_00_0_000;
-      MEMREAD:      controls = 18'b00000_1_00_00_00_00_0_000;
-      MEMREADWAIT:  controls = 18'b00000_1_00_00_00_00_0_000;
-      MEMREADVALID: controls = 18'b00000_1_00_00_00_00_0_000;
-      MEMWRITEBACK: controls = 18'b00010_0_00_00_01_00_0_000;
-      MEMWRITE:     controls = 18'b01000_1_00_00_00_00_0_000;
-      EXECUTE:      controls = 18'b00000_0_10_00_00_00_0_100;
-      ALUWRITEBACK: controls = 18'b00010_0_00_00_00_00_0_000;
-      BRANCH:       controls = 18'b00000_0_10_00_00_01_1_111;
-      IMMEXECUTE:   controls = 18'b00000_0_10_10_00_00_0_101;
-      IMMWRITEBACK: controls = 18'b00010_0_00_00_00_00_0_000;
-      LUIEX:        controls = 18'b00010_0_00_00_10_00_0_000;
-      AUIPCEX:      controls = 18'b00010_0_00_00_00_00_0_000;
-      JALEX:        controls = 18'b10010_0_00_00_11_01_0_000;
-      JALREX:       controls = 18'b10010_0_10_10_11_10_0_000;
+      FETCH:        controls = 21'b10001_0_00_01_000_00_0_000_00;
+      FETCHWAIT:    controls = 21'b00000_0_00_00_000_00_0_000_00;
+      FETCHVALID:   controls = 21'b00100_0_00_00_000_00_0_000_00;
+      DECODE:       controls = 21'b00000_0_01_10_000_00_0_000_00;
+      MEMADR:       controls = 21'b00000_0_10_10_000_00_0_000_00;
+      MEMREAD:      controls = 21'b00000_1_00_00_000_00_0_000_00;
+      MEMREADWAIT:  controls = 21'b00000_1_00_00_000_00_0_000_00;
+      MEMREADVALID: controls = 21'b00000_1_00_00_000_00_0_000_00;
+      MEMWRITEBACK: controls = 21'b00010_0_00_00_001_00_0_000_00;
+      MEMWRITE:     controls = 21'b01000_1_00_00_000_00_0_000_00;
+      EXECUTE:      controls = 21'b00000_0_10_00_000_00_0_100_00;
+      ALUWRITEBACK: controls = 21'b00010_0_00_00_000_00_0_000_00;
+      BRANCH:       controls = 21'b00000_0_10_00_000_01_1_111_00;
+      IMMEXECUTE:   controls = 21'b00000_0_10_10_000_00_0_101_00;
+      IMMWRITEBACK: controls = 21'b00010_0_00_00_000_00_0_000_00;
+      LUIEX:        controls = 21'b00010_0_00_00_010_00_0_000_00;
+      AUIPCEX:      controls = 21'b00010_0_00_00_000_00_0_000_00;
+      JALEX:        controls = 21'b10010_0_00_00_011_01_0_000_00;
+      JALREX:       controls = 21'b10010_0_10_10_011_10_0_000_00;
+      SENDB_GO:     controls = 21'b00000_0_00_00_000_00_0_000_11;
+      SENDB_WAIT:   controls = 21'b00000_0_00_00_000_00_0_000_01;
+      RECVB_GO:     controls = 21'b00000_0_00_00_000_00_0_000_10;
+      RECVB_WAIT:   controls = 21'b00000_0_00_00_000_00_0_000_00;
+      RECVB_WRITE:  controls = 21'b00010_0_00_00_100_00_0_000_00;
       default:      controls = 18'b00000_x_xx_xx_xx_xx_x_xxx;  // should never happen
     endcase
 

@@ -8,8 +8,12 @@ module controller(input  wire logic       clk, rstn,
                   output logic            pcen, memwrite,
                                           irwrite, regwrite, pcbufwrite,
                   output logic            iord,
-                  output logic      [1:0] alusrca, alusrcb, regsrc, pcsrc,
-                  output logic      [4:0] alucontrol);
+                  output logic      [1:0] alusrca, alusrcb,
+                  output logic      [2:0] regsrc,
+                  output logic      [1:0] pcsrc,
+                  output logic      [4:0] alucontrol,
+                  input  wire logic       uart_done,
+                  output logic            rors, uart_go);
 
   logic [2:0] aluop;
   logic       branch, pcwrite, taken;
@@ -18,9 +22,13 @@ module controller(input  wire logic       clk, rstn,
   maindec md(clk, rstn, op,
              pcwrite, memwrite, irwrite, regwrite, pcbufwrite,
              iord,
-             alusrca, alusrcb, regsrc, pcsrc,
+             alusrca, alusrcb,
+             regsrc,
+             pcsrc,
              branch,
-             aluop);
+             aluop,
+             uart_done,
+             rors, uart_go);
 
   aludec  ad(funct3, funct7, aluop, alucontrol);
 

@@ -5,14 +5,17 @@ module datapath(input  wire logic        clk, rstn,
                                          regwrite, pcbufwrite,
                 input  wire logic        iord,
                 input  wire logic [1:0]  alusrca, alusrcb,
-                                         regsrc, pcsrc,
+                input  wire logic [2:0]  regsrc,
+                input  wire logic [1:0]  pcsrc,
                 input  wire logic [4:0]  alucontrol,
                 output logic      [6:0]  op,
                 output logic      [2:0]  funct3,
                 output logic      [6:0]  funct7,
                 output logic             zero,
                 output logic      [31:0] adr, writedata,
-                input  wire logic [31:0] readdata);
+                input  wire logic [31:0] readdata
+                input  wire logic [7:0]  rxdata,
+                output wire logic [7:0]  txdata);
 
   // Internal signals of the datapath module
   logic [31:0] pcnext, pc, pcout;
@@ -22,10 +25,9 @@ module datapath(input  wire logic        clk, rstn,
   logic [31:0] imm, srca, srcb, aluresult, aluout;
   logic [31:0] jalrpc;
 
-  // op, funct3, and funct7 fields to controller
-  assign op     = instr[6:0];
   assign funct3 = instr[14:12];
   assign funct7 = instr[31:25];
+  assign txdata = a[7:0];
 
   // datapath
   flopenr pcreg(clk, rstn, pcen, pcnext, pc);
@@ -34,7 +36,7 @@ module datapath(input  wire logic        clk, rstn,
   flopenr instrreg(clk, rstn, irwrite, readdata, instr);
   flopr   datareg(clk, rstn, readdata, data);
 
-  mux4    wdmux(aluout, data, imm, pc, regsrc, wd3);
+  mux5    wdmux(aluout, data, imm, pc, {24'b0, rxdata}, regsrc, wd3);
   regfile irf(clk, regwrite, instr[19:15], instr[24:20], instr[11:7], wd3, rd1, rd2);
   immgen  ig(instr, imm);
 
