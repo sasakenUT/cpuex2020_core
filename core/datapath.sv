@@ -13,7 +13,7 @@ module datapath(input  wire logic        clk, rstn,
                 output logic      [6:0]  funct7,
                 output logic             zero,
                 output logic      [31:0] adr, writedata,
-                input  wire logic [31:0] readdata
+                input  wire logic [31:0] readdata,
                 input  wire logic [7:0]  rxdata,
                 output wire logic [7:0]  txdata);
 

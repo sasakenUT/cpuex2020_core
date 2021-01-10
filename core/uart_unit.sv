@@ -1,10 +1,10 @@
 `default_nettype none
 
-module urat_unit(input  wire logic       clk, rstn,
+module uart_unit(input  wire logic       clk, rstn,
                  output logic            uart_done,
                  input  wire logic       rors, uart_go,
                  output logic      [7:0] rxdata,
-                 input  wire logic [7:0] txdata
+                 input  wire logic [7:0] txdata,
                  output logic            txd,
                  input  wire logic       rxd);
 
@@ -12,8 +12,10 @@ module urat_unit(input  wire logic       clk, rstn,
                             RECV_WAIT, RECV_DONE} statetype;
   statetype state, nextstate;
 
-  logic tx_start, tx_busy, rdata, rx_ready, ferr;
-  logic data_valid;
+  logic       tx_start, tx_busy, rx_ready, ferr;
+  logic [7:0] rdata;
+  logic       data_valid;
+  logic [1:0] controls;
 
   // Instanciate uart_tx, and uart_rx
   uart_tx tx(txdata, tx_start, tx_busy, txd, clk, rstn);
@@ -45,7 +47,7 @@ module urat_unit(input  wire logic       clk, rstn,
   // next state logic
   always_comb
     case(state)
-      IDLE:         nextstate = uart_go ? (rors ? SEND_GO : RECV_GO) : IDLE;
+      IDLE:         nextstate = uart_go ? (rors ? SEND_GO : RECV_WAIT) : IDLE;
       SEND_GO:      nextstate = SEND_WAIT;
       SEND_WAIT:    nextstate = tx_busy ? SEND_WAIT : SEND_DONE;
       SEND_DONE:    nextstate = IDLE;

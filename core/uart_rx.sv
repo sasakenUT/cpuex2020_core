@@ -66,7 +66,7 @@ module uart_rx #(CLK_PER_HALF_BIT = 5208) (
      if (~rstn) begin
        sync_reg <= 3'b111;
      end else begin
-       sync_reg <= {sync_reg[2:0], rxd};
+       sync_reg <= {sync_reg[1:0], rxd};
      end
    end
 

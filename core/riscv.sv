@@ -30,7 +30,8 @@ module riscv(input  wire logic        clk, rstn,
                alusrca, alusrcb,
                regsrc,
                pcsrc,
-               alucontrol);
+               alucontrol,
+               uart_done, rors, uart_go);
 
   uart_unit  u(clk, rstn,
                uart_done,

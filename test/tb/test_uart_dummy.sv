@@ -21,7 +21,6 @@ module uart_tx(input  wire logic [7:0] txdata,
           tx_busy <= 1'b1;
       end
       if (tx_busy) begin
-          tx_start <= 1'b0;
           counter  <= counter + 1;
       end
       if (counter > 19) begin
@@ -45,7 +44,6 @@ module uart_rx(output logic      [7:0] rdata,
   always_ff @(posedge clk) begin
     if (~rstn) begin
       rx_ready <= 1'b0;
-      rxd      <= 1'b0;
       counter  <= 0;
       ferr     <= 1'b0;
     end else begin
