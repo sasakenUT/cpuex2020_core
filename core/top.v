@@ -6,7 +6,7 @@ module top(input  wire clk, rstn,
 
   reg  [31:0] adr, writedata, readdata;
   wire        memwrite;
-  reg  [19:0] addra;
+  wire  [19:0] addra;
 
   assign addra = adr[21:2];
 
