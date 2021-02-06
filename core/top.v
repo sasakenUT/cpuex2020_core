@@ -5,9 +5,9 @@ module top #(CLK_PER_HALF_BIT = 5208) (
            output wire txd,
            input  wire rxd);
 
-  reg  [31:0] adr, writedata, readdata;
+  wire [31:0] adr, writedata, readdata;
   wire        memwrite;
-  wire  [19:0] addra;
+  wire [19:0] addra;
 
   assign addra = adr[21:2];
 
