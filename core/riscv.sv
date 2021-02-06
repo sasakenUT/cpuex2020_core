@@ -1,6 +1,7 @@
 `default_nettype none
 
-module riscv(input  wire logic        clk, rstn,
+module riscv #(CLK_PER_HALF_BIT = 5208) (
+             input  wire logic        clk, rstn,
              output logic      [31:0] adr, writedata,
              output logic             memwrite,
              input  wire logic [31:0] readdata,
@@ -33,12 +34,12 @@ module riscv(input  wire logic        clk, rstn,
                alucontrol,
                uart_done, rors, uart_go);
 
-  uart_unit  u(clk, rstn,
-               uart_done,
-               rors, uart_go,
-               rxdata,
-               txdata,
-               txd, rxd);
+  uart_unit  #(CLK_PER_HALF_BIT) u(clk, rstn,
+                                   uart_done,
+                                   rors, uart_go,
+                                   rxdata,
+                                   txdata,
+                                   txd, rxd);
 
   datapath  dp(clk, rstn,
                pcen, irwrite, regwrite, pcbufwrite,

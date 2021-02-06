@@ -1,6 +1,7 @@
 `default_nettype none
 
-module top(input  wire clk, rstn,
+module top #(CLK_PER_HALF_BIT = 5208) (
+           input  wire clk, rstn,
            output wire txd,
            input  wire rxd);
 
@@ -11,7 +12,7 @@ module top(input  wire clk, rstn,
   assign addra = adr[21:2];
 
   // instantiate processor and memory
-  riscv riscv(clk, rstn, adr, writedata, memwrite, readdata, txd, rxd);
+  riscv #(CLK_PER_HALF_BIT) riscv(clk, rstn, adr, writedata, memwrite, readdata, txd, rxd);
 
   blk_mem_gen_0 bram (
     .clka(clk),         // input wire clka

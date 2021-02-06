@@ -1,6 +1,7 @@
 `default_nettype none
 
-module uart_unit(input  wire logic       clk, rstn,
+module uart_unit #(CLK_PER_HALF_BIT = 5208) (
+                 input  wire logic       clk, rstn,
                  output logic            uart_done,
                  input  wire logic       rors, uart_go,
                  output logic      [7:0] rxdata,
@@ -18,8 +19,8 @@ module uart_unit(input  wire logic       clk, rstn,
   logic [1:0] controls;
 
   // Instanciate uart_tx, and uart_rx
-  uart_tx tx(txdata, tx_start, tx_busy, txd, clk, rstn);
-  uart_rx rx(rdata,  rx_ready, ferr, rxd, clk, rstn);
+  uart_tx #(CLK_PER_HALF_BIT) tx(txdata, tx_start, tx_busy, txd, clk, rstn);
+  uart_rx #(CLK_PER_HALF_BIT) rx(rdata,  rx_ready, ferr, rxd, clk, rstn);
 
 
   // recv state
