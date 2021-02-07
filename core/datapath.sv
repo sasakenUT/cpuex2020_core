@@ -25,6 +25,7 @@ module datapath(input  wire logic        clk, rstn,
   logic [31:0] imm, srca, srcb, aluresult, aluout;
   logic [31:0] jalrpc;
 
+  assign op     = instr[6:0];
   assign funct3 = instr[14:12];
   assign funct7 = instr[31:25];
   assign txdata = a[7:0];
