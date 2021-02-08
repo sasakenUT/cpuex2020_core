@@ -1,6 +1,6 @@
 `default_nettype none
 
-module top #(CLK_PER_HALF_BIT = 5208) (
+module top #(CLK_PER_HALF_BIT = 434) (
            input  wire clk, rstn,
            output wire txd,
            input  wire rxd);
