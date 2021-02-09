@@ -1,6 +1,6 @@
 `default_nettype none
 
-module uart_unit #(CLK_PER_HALF_BIT = 5208) (
+module uart_unit #(CLK_PER_HALF_BIT = 434) (
                  input  wire logic       clk, rstn,
                  output logic            uart_done,
                  input  wire logic       rors, uart_go,

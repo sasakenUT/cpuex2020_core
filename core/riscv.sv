@@ -1,6 +1,6 @@
 `default_nettype none
 
-module riscv #(CLK_PER_HALF_BIT = 5208) (
+module riscv #(CLK_PER_HALF_BIT = 434) (
              input  wire logic        clk, rstn,
              output logic      [31:0] adr, writedata,
              output logic             memwrite,

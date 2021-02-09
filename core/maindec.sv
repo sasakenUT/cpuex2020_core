@@ -33,7 +33,7 @@ module maindec(input  wire logic       clk, rstn,
   parameter RECVB = 7'b0000001;
   parameter SENDB = 7'b0000010;
 
-  logic [20:0] controls;    // TODO: extend bit width
+  logic [20:0] controls;
 
   // state register
   always_ff @(posedge clk)
@@ -125,8 +125,8 @@ module maindec(input  wire logic       clk, rstn,
       JALEX:        controls = 21'b10010_0_00_00_011_01_0_000_00;
       JALREX:       controls = 21'b10010_0_10_10_011_10_0_000_00;
       SENDB_GO:     controls = 21'b00000_0_00_00_000_00_0_000_11;
-      SENDB_WAIT:   controls = 21'b00000_0_00_00_000_00_0_000_01;
-      RECVB_GO:     controls = 21'b00000_0_00_00_000_00_0_000_10;
+      SENDB_WAIT:   controls = 21'b00000_0_00_00_000_00_0_000_00;
+      RECVB_GO:     controls = 21'b00000_0_00_00_000_00_0_000_01;
       RECVB_WAIT:   controls = 21'b00000_0_00_00_000_00_0_000_00;
       RECVB_WRITE:  controls = 21'b00010_0_00_00_100_00_0_000_00;
       default:      controls = 21'b00000_x_xx_xx_xxx_xx_x_xxx_xx;  // should never happen
