@@ -237,6 +237,7 @@ module fadd(
   end
 endmodule
 
+/*
 module lzc(
   input   wire[26:0]  man,
   output  wire[4:0]   count
@@ -302,3 +303,4 @@ module normalize(
     (man[1] == 1'b1) ? {man[2:0], 24'b0} :
     (man[0] == 1'b1) ? {man[1:0], 25'b0} : man;
 endmodule
+*/
