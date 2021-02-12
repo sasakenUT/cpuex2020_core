@@ -33,6 +33,7 @@ module fpudec(input  wire logic [2:0] funct3,
                   FEQ:  fpucontrol = 4'b0110;
                   FLT:  fpucontrol = 4'b0111;
                   FLE:  fpucontrol = 4'b1000;
+                  default:  fpucontrol = 4'b0000;   // should never happen
                 endcase
       FCVTSW:   fpucontrol = 4'b1001;
       default:  fpucontrol = 4'b0000;   // should never happen

@@ -60,8 +60,8 @@ module riscv #(CLK_PER_HALF_BIT = 434) (
                op, funct3, funct7, zero,
                adr, writedata, readdata,
                rxdata, txdata,
-               irof, fregwrite,
-               fregsrca, fpusrca,
+               iorf, fregwrite,
+               fregsrc, fpusrca,
                fpucontrol,
                mode, fpu_go, fpu_valid);
 

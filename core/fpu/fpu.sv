@@ -28,7 +28,7 @@ module fpu(input  wire logic [31:0] a, b,
   // select output
   mux10v  resmux(faddres, fsubres, fmulres, fdivres, fsqrtres, ftoires,
                  feqres, fltres, fleres, itofres, fpucontrol, c);
-  mux10s  rdymux(faddrdy, fsburdy, fmulrdy, fdivrdy, fsqrtrdy, ftoirdy,
+  mux10s  rdymux(faddrdy, fsubrdy, fmulrdy, fdivrdy, fsqrtrdy, ftoirdy,
                  feqrdy, fltrdy, flerdy, itofrdy, fpucontrol, fpu_valid);
 
 endmodule

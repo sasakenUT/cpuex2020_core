@@ -22,6 +22,7 @@ module flptdec(input  wire logic       clk, rstn,
   parameter FMVWX  = 7'b1111000;  // freg <- ireg
 
   logic [8:0] controls;
+  logic       ok;
 
   assign ok = indecode && (op == FTYPE);
 
@@ -63,7 +64,7 @@ module flptdec(input  wire logic       clk, rstn,
       FPU_WAIT:   controls = 9'b00_00_000_00;
       IREG_WB:    controls = 9'b01_00_110_10;
       FREG_WB:    controls = 9'b10_11_000_10;
-      default:
+      default:    controls = 9'b00_00_000_00;
     endcase
 
 endmodule

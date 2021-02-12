@@ -53,7 +53,7 @@ module datapath(input  wire logic        clk, rstn,
   flopr   datareg(clk, rstn, readdata, data);
 
   // int register file, data buffer
-  mux7    wdmux(aluout, data, imm, pc, {24'b0, rxdata}, fa, fpuout, regsrc, wd3);
+  mux7    wd3mux(aluout, data, imm, pc, {24'b0, rxdata}, fa, fpuout, regsrc, wd3);
   regfile irf(clk, regwrite, instr[19:15], instr[24:20], instr[11:7], wd3, rd1, rd2);
   immgen  ig(instr, imm);
 
@@ -78,7 +78,7 @@ module datapath(input  wire logic        clk, rstn,
   regfile frf(clk, fregwrite, instr[19:15], instr[24:20], instr[11:7], fwd3, frd1, frd2);
 
   flopr   fareg(clk, rstn, frd1, fa);
-  flopr   fareg(clk, rstn, frd2, fb);
+  flopr   fbreg(clk, rstn, frd2, fb);
 
   // FPU inputs, FPU, FPU outputs
   mux2    fsrcamux(fa, a, fpusrca, fsrca);
