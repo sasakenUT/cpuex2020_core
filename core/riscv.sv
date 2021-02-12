@@ -24,6 +24,12 @@ module riscv #(CLK_PER_HALF_BIT = 434) (
   logic [7:0] rxdata;
   logic [7:0] txdata;
 
+  logic       iorf, fregwrite;
+  logic [1:0] fregsrc;
+  logic       fpusrca;
+  logic [3:0] fpucontrol;
+  logic       mode, fpu_go, fpu_valid;
+
   controller c(clk, rstn,
                op, funct3, funct7, zero,
                pcen, memwrite, irwrite, regwrite, pcbufwrite,
@@ -32,7 +38,12 @@ module riscv #(CLK_PER_HALF_BIT = 434) (
                regsrc,
                pcsrc,
                alucontrol,
-               uart_done, rors, uart_go);
+               uart_done, rors, uart_go,
+               iorf, fregwrite,
+               fregsrc,
+               fpusrca,
+               fpucontrol,
+               mode, fpu_go, fpu_valid);
 
   uart_unit  #(CLK_PER_HALF_BIT) u(clk, rstn,
                                    uart_done,
@@ -48,7 +59,11 @@ module riscv #(CLK_PER_HALF_BIT = 434) (
                alucontrol,
                op, funct3, funct7, zero,
                adr, writedata, readdata,
-               rxdata, txdata);
+               rxdata, txdata,
+               irof, fregwrite,
+               fregsrca, fpusrca,
+               fpucontrol,
+               mode, fpu_go, fpu_valid);
 
 endmodule
 
