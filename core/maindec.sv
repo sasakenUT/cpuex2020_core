@@ -66,6 +66,8 @@ module maindec(input  wire logic       clk, rstn,
                       RECVB:    nextstate = RECVB_GO;
                       SENDB:    nextstate = SENDB_GO;
                       FTYPE:    nextstate = FTEXECUTE;
+                      FLW:      nextstate = MEMADR;
+                      FSW:      nextstate = MEMADR;
                       default:  nextstate = FETCH;   // should never happen
                     endcase
       MEMADR:       case(op)
