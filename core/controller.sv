@@ -52,7 +52,7 @@ module controller(input  wire logic       clk, rstn,
               indecode, fpu_valid, fregwb,
               flpt_done, fpu_go);
 
-  fpudec  fd(funct3, funct7, fpucontrol, fpusrca, mode);
+  fpudec  fd(funct3, funct7, fpucontrol, fpusrca, mode, fregwb);
 
   assign pcen = pcwrite | taken;
   assign regwrite = regwrite_i | regwrite_f;

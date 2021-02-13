@@ -3,7 +3,7 @@
 module fpudec(input  wire logic [2:0] funct3,
               input  wire logic [6:0] funct7,
               output logic      [3:0] fpucontrol,
-              output logic            fpusrca, mode);
+              output logic            fpusrca, mode, fregwb);
 
   parameter FADD   = 7'b0000000;
   parameter FSUB   = 7'b0000100;
@@ -20,6 +20,7 @@ module fpudec(input  wire logic [2:0] funct3,
 
   assign fpusrca = (funct7 == FCVTSW);
   assign mode    = (funct7 == FCVTWS) && (funct3 == 3'b010);
+  assign fregwb  = (funct7 == FCMP) || (funct7 == FCVTWS);
 
   always_comb
     case(funct7)
