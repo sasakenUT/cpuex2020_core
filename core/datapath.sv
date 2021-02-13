@@ -75,7 +75,7 @@ module datapath(input  wire logic        clk, rstn,
 
   // float register file, data buffer
   mux4    fwdmux(data, {~fb[31], fa[30:0]}, a, fpuout, fregsrc, fwd3);
-  regfile frf(clk, fregwrite, instr[19:15], instr[24:20], instr[11:7], fwd3, frd1, frd2);
+  fregfile frf(clk, fregwrite, instr[19:15], instr[24:20], instr[11:7], fwd3, frd1, frd2);
 
   flopr   fareg(clk, rstn, frd1, fa);
   flopr   fbreg(clk, rstn, frd2, fb);
