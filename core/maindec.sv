@@ -157,6 +157,13 @@ module maindec(input  wire logic       clk, rstn,
       default:      controls = 26'b00000_x_xx_xx_xxx_xx_x_xxx_xx;  // should never happen
     endcase
 
+    // debug signal
+    logic [31:0] steps;
+
+    always_ff @(posedge clk)
+      if (~rstn) steps <= 32'b0;
+      else if (state == FETCHWAIT) steps <= steps + 32'b1;
+
 endmodule
 
 `default_nettype wire
