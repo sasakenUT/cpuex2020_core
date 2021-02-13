@@ -73,6 +73,7 @@ module maindec(input  wire logic       clk, rstn,
       MEMADR:       case(op)
                       LW:       nextstate = MEMREAD;
                       SW:       nextstate = MEMWRITE;
+                      FLW:      nextstate = MEMREAD;
                       FSW:      nextstate = FMEMWRITE;
                       default:  nextstate = FETCH;   // should never happen
                     endcase
