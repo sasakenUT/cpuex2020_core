@@ -83,7 +83,7 @@ module datapath(input  wire logic        clk, rstn,
   // FPU inputs, FPU, FPU outputs
   mux2    fsrcamux(fa, a, fpusrca, fsrca);
 
-  fpu     fpu(fpusrca, fb, fpuresult, fpu_go, fpucontrol, mode, fpu_valid, clk);
+  fpu     fpu(fsrca, fb, fpuresult, fpu_go, fpucontrol, mode, fpu_valid, clk);
 
   flopr   fpureg(clk, rstn, fpuresult, fpuout);
 
