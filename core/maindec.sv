@@ -162,7 +162,7 @@ module maindec(input  wire logic       clk, rstn,
 
     always_ff @(posedge clk)
       if (~rstn) steps <= 32'b0;
-      else if (state == FETCHWAIT) steps <= steps + 32'b1;
+      else if (state == FETCH) steps <= steps + 32'b1;
 
 endmodule
 
