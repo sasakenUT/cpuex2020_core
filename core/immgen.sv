@@ -17,7 +17,9 @@ module immgen(input wire logic [31:0] instr,
       7'b1100111: imm = {{20{instr[31]}}, instr[31:20]};  // JALR
       7'b0000011: imm = {{20{instr[31]}}, instr[31:20]};  // LW
       7'b0100011: imm = {{20{instr[31]}}, instr[31:25], instr[11:7]}; // SW
-      default:    imm = 32'b0;  // R-type
+      7'b0000111: imm = {{20{instr[31]}}, instr[31:20]};  // FLW
+      7'b0100111: imm = {{20{instr[31]}}, instr[31:25], instr[11:7]}; // FSW
+      default:    imm = 32'b0;  // other instruction
     endcase
 
 endmodule
