@@ -6,6 +6,7 @@ module test_top_tb();
   // Input output signals
   logic clk, rstn, txd, rxd;
 
+  // Instanciate units
   top uut(clk, rstn, txd, rxd);
 
   // generate clock
@@ -20,7 +21,6 @@ module test_top_tb();
   initial
   begin
     rstn <= 0;
-    rxd  <= 0;
     #100;
     rstn <= 1;
   end

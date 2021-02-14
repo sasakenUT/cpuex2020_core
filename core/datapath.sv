@@ -15,15 +15,26 @@ module datapath(input  wire logic        clk, rstn,
                 output logic      [31:0] adr, writedata,
                 input  wire logic [31:0] readdata,
                 input  wire logic [7:0]  rxdata,
-                output wire logic [7:0]  txdata);
+                output wire logic [7:0]  txdata,
+                input  wire logic        iorf, fregwrite,
+                input  wire logic [1:0]  fregsrc,
+                input  wire logic        fpusrca,
+                input  wire logic [3:0]  fpucontrol,
+                input  wire logic        mode,
+                input  wire logic        fpu_go,
+                output logic             fpu_valid);
 
   // Internal signals of the datapath module
   logic [31:0] pcnext, pc, pcout;
   logic [31:0] instr, data;
   logic [31:0] wd3, rd1, rd2;
-  logic [31:0] a;
+  logic [31:0] a, b;
   logic [31:0] imm, srca, srcb, aluresult, aluout;
   logic [31:0] jalrpc;
+
+  logic [31:0] fwd3, frd1, frd2;
+  logic [31:0] fa, fb;
+  logic [31:0] fsrca, fpuresult, fpuout;
 
   assign op     = instr[6:0];
   assign funct3 = instr[14:12];
@@ -31,29 +42,50 @@ module datapath(input  wire logic        clk, rstn,
   assign txdata = a[7:0];
 
   // datapath
+  // program counter
   flopenr pcreg(clk, rstn, pcen, pcnext, pc);
   mux2    adrmux(pc, aluout, iord, adr);
+
+  // memory
+  mux2    wdmux(b, fb, iorf, writedata);
 
   flopenr instrreg(clk, rstn, irwrite, readdata, instr);
   flopr   datareg(clk, rstn, readdata, data);
 
-  mux5    wdmux(aluout, data, imm, pc, {24'b0, rxdata}, regsrc, wd3);
+  // int register file, data buffer
+  mux7    wd3mux(aluout, data, imm, pc, {24'b0, rxdata}, fa, fpuout, regsrc, wd3);
   regfile irf(clk, regwrite, instr[19:15], instr[24:20], instr[11:7], wd3, rd1, rd2);
   immgen  ig(instr, imm);
 
-  flopenr curpcreg(clk, rstn, pcbufwrite, pc, pcout);
+  flopenr curpcreg(clk, rstn, pcbufwrite, pc, pcout);   // current pc register
   flopr   areg(clk, rstn, rd1, a);
-  flopr   breg(clk, rstn, rd2, writedata);
+  flopr   breg(clk, rstn, rd2, b);
 
+  // ALU inputs, ALU, ALU outputs
   mux3    srcamux(pc, pcout, a, alusrca, srca);
-  mux3    srcbmux(writedata, 32'b100, imm, alusrcb, srcb);
+  mux3    srcbmux(b, 32'b100, imm, alusrcb, srcb);
 
   alu     alu(srca, srcb, alucontrol, aluresult, zero);
 
   flopr   alureg(clk, rstn, aluresult, aluout);
   setlsb0 slsb0(aluresult, jalrpc);
 
+  // pc source
   mux3    pcmux(aluresult, aluout, jalrpc, pcsrc, pcnext);
+
+  // float register file, data buffer
+  mux4    fwdmux(data, {~fb[31], fa[30:0]}, a, fpuout, fregsrc, fwd3);
+  fregfile frf(clk, fregwrite, instr[19:15], instr[24:20], instr[11:7], fwd3, frd1, frd2);
+
+  flopr   fareg(clk, rstn, frd1, fa);
+  flopr   fbreg(clk, rstn, frd2, fb);
+
+  // FPU inputs, FPU, FPU outputs
+  mux2    fsrcamux(fa, a, fpusrca, fsrca);
+
+  fpu     fpu(fsrca, fb, fpuresult, fpu_go, fpucontrol, mode, fpu_valid, clk);
+
+  flopr   fpureg(clk, rstn, fpuresult, fpuout);
 
 endmodule
 
