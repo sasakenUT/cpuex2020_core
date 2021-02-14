@@ -15,29 +15,28 @@ module uart_unit #(CLK_PER_HALF_BIT = 434) (
 
   logic       tx_start, tx_busy, rx_ready, ferr;
   logic [7:0] rdata;
-  logic       data_valid;
-  logic [1:0] controls;
+  //logic       data_valid;
+  logic [2:0] controls;
+  logic       accept, empty;
 
-  // Instanciate uart_tx, and uart_rx
+  // Instanciate uart_tx, uart_rx, and fifo
   uart_tx #(CLK_PER_HALF_BIT) tx(txdata, tx_start, tx_busy, txd, clk, rstn);
   uart_rx #(CLK_PER_HALF_BIT) rx(rdata,  rx_ready, ferr, rxd, clk, rstn);
+  fifo fifo(rdata, rxdata, rx_ready, accept, empty, clk, rstn);
 
 
+  /*
   // recv state
   always_ff @(posedge clk) begin
     if(~rstn) begin
       rxdata     <= 8'b0;
-      data_valid <= 1'b0;
     end else begin
       if (rx_ready) begin
         rxdata     <= rdata;
-        data_valid <= 1'b1;
-      end
-      if (data_valid) begin
-        data_valid <= 1'b0;
       end
     end
   end
+  */
 
 
   // state register
@@ -52,24 +51,24 @@ module uart_unit #(CLK_PER_HALF_BIT = 434) (
       SEND_GO:      nextstate = SEND_WAIT;
       SEND_WAIT:    nextstate = tx_busy ? SEND_WAIT : SEND_DONE;
       SEND_DONE:    nextstate = IDLE;
-      RECV_WAIT:    nextstate = data_valid ? RECV_DONE : RECV_WAIT;
+      RECV_WAIT:    nextstate = ~empty ? RECV_DONE : RECV_WAIT;
       RECV_DONE:    nextstate = IDLE;
       default:      nextstate = IDLE;   // should never happen
     endcase
 
 
   // control logic
-  assign {uart_done, tx_start} = controls;
+  assign {uart_done, tx_start, accept} = controls;
 
   always_comb
     case(state)
-      IDLE:         controls = 2'b00;
-      SEND_GO:      controls = 2'b01;
-      SEND_WAIT:    controls = 2'b00;
-      SEND_DONE:    controls = 2'b10;
-      RECV_WAIT:    controls = 2'b00;
-      RECV_DONE:    controls = 2'b10;
-      default:      controls = 2'b00;
+      IDLE:         controls = 3'b000;
+      SEND_GO:      controls = 3'b010;
+      SEND_WAIT:    controls = 3'b000;
+      SEND_DONE:    controls = 3'b100;
+      RECV_WAIT:    controls = 3'b000;
+      RECV_DONE:    controls = 3'b101;
+      default:      controls = 3'b000;
     endcase
 
 endmodule

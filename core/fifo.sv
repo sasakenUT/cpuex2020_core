@@ -11,12 +11,12 @@ module fifo(input  wire logic [7:0] indata,
   logic [9:0] head, tail;
 
   assign empty = (head == tail);
+  assign outdata = buffer[head];
 
   always @(posedge clk) begin
     if (~rstn) begin
       head <= 10'b0;
       tail <= 10'b0;
-      outdata <= 8'b0;
       buffer[0] <= 8'b0;
     end else begin
       if (push) begin
@@ -24,7 +24,6 @@ module fifo(input  wire logic [7:0] indata,
         tail  <= tail + 10'b1;
       end
       if (pop) begin
-        outdata <= buffer[head];
         head  <= head + 10'b1;
       end
     end
