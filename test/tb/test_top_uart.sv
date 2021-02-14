@@ -31,13 +31,7 @@ module test_top_tb();
   begin
     rstn <= 0;
     #100;
-    tx_start <= 0;
     rstn <= 1;
-    indata <= 8'ha;
-    #10;
-    tx_start <= 1;
-    #10;
-    tx_start <= 0;
   end
 
 endmodule
