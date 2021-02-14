@@ -10,7 +10,7 @@ module test_top_tb();
   logic [7:0] indata, outdata;
   logic       tx_start, tx_busy, rready, ferr;
   logic [7:0] sld_in[1299:0];
-  logic       send_go;
+  logic       send_go, send_end;
   logic [10:0] srv_cnt;
 
   // uart parameter
