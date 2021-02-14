@@ -14,30 +14,18 @@ module uart_unit #(CLK_PER_HALF_BIT = 434) (
   statetype state, nextstate;
 
   logic       tx_start, tx_busy, rx_ready, ferr;
-  logic [7:0] rdata;
-  //logic       data_valid;
+  logic [7:0] rdata, outdata;
   logic [2:0] controls;
   logic       accept, empty;
 
   // Instanciate uart_tx, uart_rx, and fifo
   uart_tx #(CLK_PER_HALF_BIT) tx(txdata, tx_start, tx_busy, txd, clk, rstn);
   uart_rx #(CLK_PER_HALF_BIT) rx(rdata,  rx_ready, ferr, rxd, clk, rstn);
-  fifo fifo(rdata, rxdata, rx_ready, accept, empty, clk, rstn);
+  fifo fifo(rdata, outdata, rx_ready, accept, empty, clk, rstn);
 
-
-  /*
-  // recv state
-  always_ff @(posedge clk) begin
-    if(~rstn) begin
-      rxdata     <= 8'b0;
-    end else begin
-      if (rx_ready) begin
-        rxdata     <= rdata;
-      end
-    end
-  end
-  */
-
+  // set recv data
+  always_ff @(posedge clk)
+    if (accept) rxdata <= outdata;
 
   // state register
   always_ff @(posedge clk)
