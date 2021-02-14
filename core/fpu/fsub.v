@@ -1,4 +1,4 @@
-module fsub(
+module fadd(
   input   wire[31:0] a,
   input   wire[31:0] b,
   input   wire en,
@@ -44,10 +44,12 @@ module fsub(
 
     assign aSign = a[31];
     assign aExp = a[30:23];
-    assign aMan = {2'b1, a[22:0]};
+    assign aMan = aExp != 8'b0 ? {2'b1, a[22:0]} : 25'b0;
+
+    // inverse sign
     assign bSign = ~b[31];
     assign bExp = b[30:23];
-    assign bMan = {2'b1, b[22:0]};
+    assign bMan = bExp != 8'b0 ? {2'b1, b[22:0]} : 25'b0;
 
     lzc ulzc(subMan, lzc);
     normalize un(subMan, normalizedSub);
