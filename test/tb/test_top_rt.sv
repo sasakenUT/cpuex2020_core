@@ -51,10 +51,10 @@ module test_top_tb();
       if (~send_end && send_go) begin
         if (~tx_busy) begin
           tx_start <= 1'b1;
-          srv_cnt  <= srv_cnt + 11'b1;
         end
         if (tx_start) begin
           tx_start <= 1'b0;
+          srv_cnt  <= srv_cnt + 11'b1;
         end
       end
     end
