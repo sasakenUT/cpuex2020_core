@@ -1,4 +1,4 @@
-`default_nettype
+`default_nettype none
 
 module fsgngen(input  wire logic [31:0] a, b,
                input  wire logic [2:0]  funct3,
@@ -13,4 +13,4 @@ module fsgngen(input  wire logic [31:0] a, b,
 
 endmodule
 
-`default_nettype
+`default_nettype wire

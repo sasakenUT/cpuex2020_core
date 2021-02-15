@@ -9,7 +9,7 @@ module flptdec(input  wire logic       clk, rstn,
                input wire logic        indecode, fpu_valid, fregwb,
                output logic            flpt_done, fpu_go);
 
-  typedef enum logic [2:0] {F_DECODE, FSGNJN_EX, FMV_X_W_EX, FMV_W_X_EX,
+  typedef enum logic [2:0] {F_DECODE, FSGN_EX, FMV_X_W_EX, FMV_W_X_EX,
                             FPU_GO, FPU_WAIT, IREG_WB, FREG_WB} statetype;
   statetype state, nextstate;
 
@@ -17,7 +17,7 @@ module flptdec(input  wire logic       clk, rstn,
   parameter FTYPE  = 7'b1010011;
 
   // function7 code
-  parameter FSGNJN = 7'b0010000;
+  parameter FSGN   = 7'b0010000;
   parameter FMVXW  = 7'b1110000;  // ireg <- freg
   parameter FMVWX  = 7'b1111000;  // freg <- ireg
 
@@ -34,11 +34,11 @@ module flptdec(input  wire logic       clk, rstn,
   // next state logic
   always_comb
     case(state)
-      F_DECODE:   nextstate = ok ? ((funct7 == FSGNJN) ? FSGNJN_EX :
-                                    (funct7 == FMVXW)  ? FMV_X_W_EX :
-                                    (funct7 == FMVWX)  ? FMV_W_X_EX :
+      F_DECODE:   nextstate = ok ? ((funct7 == FSGN)  ? FSGN_EX :
+                                    (funct7 == FMVXW) ? FMV_X_W_EX :
+                                    (funct7 == FMVWX) ? FMV_W_X_EX :
                                     FPU_GO) : F_DECODE;
-      FSGNJN_EX:  nextstate = F_DECODE;
+      FSGN_EX:    nextstate = F_DECODE;
       FMV_X_W_EX: nextstate = F_DECODE;
       FMV_W_X_EX: nextstate = F_DECODE;
       FPU_GO:     nextstate = FPU_WAIT;
@@ -57,7 +57,7 @@ module flptdec(input  wire logic       clk, rstn,
   always_comb
     case(state)
       F_DECODE:   controls = 9'b00_00_000_00;
-      FSGNJN_EX:  controls = 9'b10_01_000_10;
+      FSGN_EX:    controls = 9'b10_01_000_10;
       FMV_X_W_EX: controls = 9'b01_00_101_10;
       FMV_W_X_EX: controls = 9'b10_10_000_10;
       FPU_GO:     controls = 9'b00_00_000_01;
