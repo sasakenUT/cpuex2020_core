@@ -34,7 +34,7 @@ module datapath(input  wire logic        clk, rstn,
 
   logic [31:0] fwd3, frd1, frd2;
   logic [31:0] fa, fb;
-  logic [31:0] fsrca, fpuresult, fpuout;
+  logic [31:0] fsgnres, fsrca, fpuresult, fpuout;
 
   assign op     = instr[6:0];
   assign funct3 = instr[14:12];
@@ -74,7 +74,8 @@ module datapath(input  wire logic        clk, rstn,
   mux3    pcmux(aluresult, aluout, jalrpc, pcsrc, pcnext);
 
   // float register file, data buffer
-  mux4    fwdmux(data, {~fb[31], fa[30:0]}, a, fpuout, fregsrc, fwd3);
+  fsgngen fg(fa, fb, funct3, fsgnres);
+  mux4    fwdmux(data, fsgnres, a, fpuout, fregsrc, fwd3);
   fregfile frf(clk, fregwrite, instr[19:15], instr[24:20], instr[11:7], fwd3, frd1, frd2);
 
   flopr   fareg(clk, rstn, frd1, fa);
