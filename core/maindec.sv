@@ -60,9 +60,9 @@ module maindec(input  wire logic       clk, rstn,
       DECODE:       case(op)
                       LW:       nextstate = MEMADR;
                       SW:       nextstate = MEMADR;
-                      RTYPE:    nextstate = nop ? FETCH : EXECUTE;
+                      RTYPE:    nextstate = EXECUTE;
                       BTYPE:    nextstate = BRANCH;
-                      ITYPE:    nextstate = IMMEXECUTE;
+                      ITYPE:    nextstate = nop ? FETCH : IMMEXECUTE;
                       LUI:      nextstate = LUIEX;
                       AUIPC:    nextstate = AUIPCEX;
                       JAL:      nextstate = JALEX;
