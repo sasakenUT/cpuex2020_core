@@ -27,14 +27,14 @@ module datapath(input  wire logic        clk, rstn,
   // Internal signals of the datapath module
   logic [31:0] pcnext, pc, pcout;
   logic [31:0] instr, data;
-  logic [31:0] wd3, rd1, rd2;
+  logic [31:0] wd3, rd1, rd2, ur3;
   logic [31:0] a, b;
   logic [31:0] imm, srca, srcb, aluresult, aluout;
   logic [31:0] jalrpc;
 
   logic [31:0] fwd3, frd1, frd2;
   logic [31:0] fa, fb;
-  logic [31:0] fsrca, fpuresult, fpuout;
+  logic [31:0] fsgnres, fsrca, fpuresult, fpuout;
 
   assign op     = instr[6:0];
   assign funct3 = instr[14:12];
@@ -53,8 +53,8 @@ module datapath(input  wire logic        clk, rstn,
   flopr   datareg(clk, rstn, readdata, data);
 
   // int register file, data buffer
-  mux7    wd3mux(aluout, data, imm, pc, {24'b0, rxdata}, fa, fpuout, regsrc, wd3);
-  regfile irf(clk, regwrite, instr[19:15], instr[24:20], instr[11:7], wd3, rd1, rd2);
+  mux7    wd3mux(aluout, data, imm, pc, {ur3[31:8], rxdata}, fa, fpuout, regsrc, wd3);
+  regfile irf(clk, regwrite, instr[19:15], instr[24:20], instr[11:7], wd3, rd1, rd2, ur3);
   immgen  ig(instr, imm);
 
   flopenr curpcreg(clk, rstn, pcbufwrite, pc, pcout);   // current pc register
@@ -74,7 +74,8 @@ module datapath(input  wire logic        clk, rstn,
   mux3    pcmux(aluresult, aluout, jalrpc, pcsrc, pcnext);
 
   // float register file, data buffer
-  mux4    fwdmux(data, {~fb[31], fa[30:0]}, a, fpuout, fregsrc, fwd3);
+  fsgngen fg(fa, fb, funct3, fsgnres);
+  mux4    fwdmux(data, fsgnres, a, fpuout, fregsrc, fwd3);
   fregfile frf(clk, fregwrite, instr[19:15], instr[24:20], instr[11:7], fwd3, frd1, frd2);
 
   flopr   fareg(clk, rstn, frd1, fa);
