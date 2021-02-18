@@ -15,7 +15,8 @@ module maindec(input  wire logic       clk, rstn,
                output logic            iorf, fregwrite_i,
                output logic      [1:0] fregsrc_i,
                output logic            indecode,
-               input  wire logic       flpt_done);
+               input  wire logic       flpt_done,
+               input  wire logic [24:0] rest_instr);
 
   typedef enum logic [4:0] {FETCH, FETCHWAIT, FETCHVALID, DECODE, MEMADR,
                             MEMREAD, MEMREADWAIT, MEMREADVALID, MEMWRITEBACK,
@@ -41,6 +42,9 @@ module maindec(input  wire logic       clk, rstn,
   parameter FTYPE = 7'b1010011;
 
   logic [25:0] controls;
+  logic        nop;
+
+  assign nop = (25'b0 == rest_instr);
 
   // state register
   always_ff @(posedge clk)
@@ -58,7 +62,7 @@ module maindec(input  wire logic       clk, rstn,
                       SW:       nextstate = MEMADR;
                       RTYPE:    nextstate = EXECUTE;
                       BTYPE:    nextstate = BRANCH;
-                      ITYPE:    nextstate = IMMEXECUTE;
+                      ITYPE:    nextstate = nop ? FETCH : IMMEXECUTE;
                       LUI:      nextstate = LUIEX;
                       AUIPC:    nextstate = AUIPCEX;
                       JAL:      nextstate = JALEX;

@@ -19,7 +19,8 @@ module controller(input  wire logic       clk, rstn,
                   output logic            fpusrca,
                   output logic      [3:0] fpucontrol,
                   output logic            mode, fpu_go,
-                  input  wire logic       fpu_valid);
+                  input  wire logic       fpu_valid,
+                  input  wire logic [24:0] rest_instr);
 
   logic [2:0] aluop;
   logic       branch, pcwrite, taken;
@@ -41,7 +42,8 @@ module controller(input  wire logic       clk, rstn,
              rors, uart_go,
              iorf, fregwrite_i,
              fregsrc_i,
-             indecode, flpt_done);
+             indecode, flpt_done,
+             rest_instr);
 
   aludec  ad(funct3, funct7, aluop, alucontrol);
 

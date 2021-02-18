@@ -22,7 +22,8 @@ module datapath(input  wire logic        clk, rstn,
                 input  wire logic [3:0]  fpucontrol,
                 input  wire logic        mode,
                 input  wire logic        fpu_go,
-                output logic             fpu_valid);
+                output logic             fpu_valid,
+                output logic      [24:0] rest_instr);
 
   // Internal signals of the datapath module
   logic [31:0] pcnext, pc, pcout;
@@ -40,6 +41,7 @@ module datapath(input  wire logic        clk, rstn,
   assign funct3 = instr[14:12];
   assign funct7 = instr[31:25];
   assign txdata = a[7:0];
+  assign rest_instr = instr[31:7];
 
   // datapath
   // program counter
